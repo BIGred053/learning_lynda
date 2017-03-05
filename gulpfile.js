@@ -7,6 +7,8 @@ var concat = require('gulp-concat'),
 	uglify = require('gulp-uglify'),
 	jsonMinify = require('gulp-jsonminify'),
 	minifyHTML = require('gulp-minify-html'),
+	imageMin = require('gulp-imagemin'),
+	pngCrush = require('imagemin-pngcrush'),
 	browserify = require('gulp-browserify');
 var sass = require('gulp-ruby-sass'),
 	connect = require('gulp-connect');
@@ -92,6 +94,7 @@ gulp.task('watch', function () {
 	gulp.watch('components/sass/*.scss', ['compass']);
 	gulp.watch('builds/development/*.html', ['html']);
 	gulp.watch('builds/development/js/*.json', ['json']);
+	gulp.watch('builds/development/images/**/*.*', ['images']);
 });
 
 
@@ -124,9 +127,24 @@ gulp.task('json', function() {
 		.pipe(connect.reload());
 });
 
+
+// Image compression task
+
+gulp.task('images', function() {
+	gulp.src('builds/development/images/**/*.*')
+		.pipe(gulpif(env === 'production', imageMin({
+			progressive: true,
+			svgoPlugins: [{ removeViewBox: false }],
+			use: [pngCrush()]
+		})))
+		.pipe(gulpif(env === 'production', gulp.dest('builds/production/images')))
+		.pipe(connect.reload());
+});
+
+
 // Run all tasks in specified sequence
 // Calling this task default, so that it runs by just typing gulp
 // 
 
-gulp.task('default', ['html', 'json', 'coffee', 'js', 'compass', 'connect', 'watch']);
+gulp.task('default', ['html', 'json', 'coffee', 'js', 'compass', 'images', 'connect', 'watch']);
 
