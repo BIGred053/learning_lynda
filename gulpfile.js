@@ -5,6 +5,7 @@ var concat = require('gulp-concat'),
 	compass = require('gulp-compass'),
 	gulpif = require('gulp-if'),
 	uglify = require('gulp-uglify'),
+	jsonMinify = require('gulp-jsonminify'),
 	minifyHTML = require('gulp-minify-html'),
 	browserify = require('gulp-browserify');
 var sass = require('gulp-ruby-sass'),
@@ -90,7 +91,7 @@ gulp.task('watch', function () {
 	gulp.watch(jsSources, ['js']);
 	gulp.watch('components/sass/*.scss', ['compass']);
 	gulp.watch('builds/development/*.html', ['html']);
-	gulp.watch(jsonSources, ['json']);
+	gulp.watch('builds/development/js/*.json', ['json']);
 });
 
 
@@ -117,7 +118,9 @@ gulp.task('html', function() {
 // JSON reload task
 
 gulp.task('json', function() {
-	gulp.src(jsonSources)
+	gulp.src('builds/development/js/*.json')
+		.pipe(gulpif(env === 'production', jsonMinify()))
+		.pipe(gulpif(env === 'production', gulp.dest('builds/production/js')))
 		.pipe(connect.reload());
 });
 
