@@ -4,7 +4,8 @@ var coffee = require('gulp-coffee');
 var concat = require('gulp-concat'),
 	compass = require('gulp-compass'),
 	browserify = require('gulp-browserify');
-var sass = require('gulp-ruby-sass');
+var sass = require('gulp-ruby-sass'),
+	connect = require('gulp-connect');
 
 var coffeeSources = ['components/coffee/tagline.coffee'];
 var jsSources = [
@@ -27,6 +28,7 @@ gulp.task('js', function () {
 		.pipe(concat('script.js'))
 		.pipe(browserify())
 		.pipe(gulp.dest('builds/development/js'))
+		.pipe(connect.reload())
 });
 
 // Per StackOverflow, gulp-css is "blacklisted" due to not being a true gulp plugin
@@ -48,6 +50,7 @@ gulp.task('compass', function() {
      lineNumbers: true
    }).on('error', gutil.log)
    .pipe(gulp.dest('builds/development/css'))
+   .pipe(connect.reload())
 });
 
 
@@ -62,9 +65,21 @@ gulp.task('watch', function () {
 });
 
 
+// Gulp Connect task
+// Will spin up server and auto reload page on change
+// 
+
+gulp.task('connect', function() {
+	connect.server({
+		root: 'builds/development',
+		livereload: true
+	});
+});
+
+
 // Run all tasks in specified sequence
 // Calling this task default, so that it runs by just typing gulp
 // 
 
-gulp.task('default', ['coffee', 'js', 'compass', 'watch']);
+gulp.task('default', ['coffee', 'js', 'compass', 'connect', 'watch']);
 
