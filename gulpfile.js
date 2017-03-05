@@ -51,3 +51,9 @@ gulp.task('compass', function() {
    .pipe(gulp.dest('builds/development/css'))
 });
 
+
+// Run all tasks in specified sequence
+// Calling this task default, so that it runs by just typing gulp
+// 
+
+gulp.task('default', ['coffee', 'js', 'compass']);
