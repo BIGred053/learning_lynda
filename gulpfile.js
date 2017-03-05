@@ -66,5 +66,5 @@ gulp.task('watch', function () {
 // Calling this task default, so that it runs by just typing gulp
 // 
 
-gulp.task('default', ['coffee', 'js', 'compass']);
+gulp.task('default', ['coffee', 'js', 'compass', 'watch']);
 
