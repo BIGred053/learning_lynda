@@ -42,7 +42,6 @@ gulp.task('js', function () {
 // 		.pipe(gulp.dest('builds/development/css'))
 // });
 
-
 gulp.task('compass', function() {
    return sass(sassSources, {
      compass: true,
@@ -52,8 +51,20 @@ gulp.task('compass', function() {
 });
 
 
+// Gulp Watch task
+// Will monitor everything and execute tasks when specific sources change
+// 
+
+gulp.task('watch', function () {
+	gulp.watch(coffeeSources, ['coffee']);
+	gulp.watch(jsSources, ['js']);
+	gulp.watch('components/sass/*.scss', ['compass']);
+});
+
+
 // Run all tasks in specified sequence
 // Calling this task default, so that it runs by just typing gulp
 // 
 
 gulp.task('default', ['coffee', 'js', 'compass']);
+
