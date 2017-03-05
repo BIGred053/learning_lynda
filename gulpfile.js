@@ -7,16 +7,36 @@ var concat = require('gulp-concat'),
 var sass = require('gulp-ruby-sass'),
 	connect = require('gulp-connect');
 
-var coffeeSources = ['components/coffee/tagline.coffee'];
-var jsSources = [
+var env, 
+	coffeeSources, 
+	jsSources, 
+	sassSources, 
+	htmlSources, 
+	jsonSources, 
+	outputDir,
+	sassStyle;
+
+// To run in production use command NODE_ENV=production gulp
+env = process.env.NODE_ENV || 'development'; // Specify environment (development or production). Default behavior is development.
+
+if(env == 'development') {
+	outputDir = 'builds/development';
+	sassStyle = 'expanded';
+} else {
+	outputDir = 'builds/production';
+	sassStyle = 'compressed';
+}
+
+coffeeSources = ['components/coffee/tagline.coffee'];
+jsSources = [
 	'components/scripts/rclick.js',
 	'components/scripts/pixgrid.js',
 	'components/scripts/tagline.js',
 	'components/scripts/template.js'
 ];
-var sassSources = ['components/sass/style.scss'];
-var htmlSources = ['builds/development/*.html'];
-var jsonSources = ['builds/development/js/*.json'];
+sassSources = ['components/sass/style.scss'];
+htmlSources = [outputDir + '/*.html'];
+jsonSources = [outputDir + '/js/*.json'];
 
 gulp.task('coffee', function() {
 	gulp.src(coffeeSources)
@@ -29,7 +49,7 @@ gulp.task('js', function () {
 	gulp.src(jsSources)
 		.pipe(concat('script.js'))
 		.pipe(browserify())
-		.pipe(gulp.dest('builds/development/js'))
+		.pipe(gulp.dest(outputDir + '/js'))
 		.pipe(connect.reload())
 });
 
@@ -39,19 +59,20 @@ gulp.task('js', function () {
 // 	gulp.src(sassSources)
 // 		.pipe(compass({
 // 			sass: 'components/sass',
-// 			image: 'builds/development/images',
+// 			image: outputDir + '/images',
 // 			style: 'expanded'
 // 		}))
 // 		.on('error', gutil.log)
-// 		.pipe(gulp.dest('builds/development/css'))
+// 		.pipe(gulp.dest(outputDir + '/css'))
 // });
 
 gulp.task('compass', function() {
    return sass(sassSources, {
      compass: true,
-     lineNumbers: true
+     lineNumbers: true,
+     style: sassStyle
    }).on('error', gutil.log)
-   .pipe(gulp.dest('builds/development/css'))
+   .pipe(gulp.dest(outputDir + '/css'))
    .pipe(connect.reload())
 });
 
@@ -75,7 +96,7 @@ gulp.task('watch', function () {
 
 gulp.task('connect', function() {
 	connect.server({
-		root: 'builds/development',
+		root: outputDir,
 		livereload: true
 	});
 });
